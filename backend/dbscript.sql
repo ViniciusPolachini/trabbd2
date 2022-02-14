@@ -60,35 +60,38 @@ CONSTRAINT id PRIMARY KEY (idProduto, idCarrinho)
 CREATE TABLE compras(
 idCompra INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
 idCarrinho INTEGER NOT NULL,
-dataCompra DATE,
+dataCompra DATE DEFAULT getdate(),
 pagamento VARCHAR(20),
 FOREIGN KEY (idCarrinho) REFERENCES carrinho (idCarrinho)
 );
 
-CREATE PROCEDURE efetuaCompra(dataCompra DATE, idCarrinho INTEGER, statusPagamento INTEGER)
+DELIMITER $$
+CREATE PROCEDURE efetuaCompra(idCarrinho INTEGER, statusPagamento INTEGER)
 BEGIN
    SET @estado='';
    CASE statusPagamento
         WHEN 0 THEN SET @estado='pendente';
         WHEN 1 THEN SET @estado='pago';
    END CASE;
-   INSERT INTO compras (idCarrinho, dataCompra, pagamento) VALUES (idCarrinho, dataCompra, estado);
-END;
+   INSERT INTO compras (idCarrinho, pagamento) VALUES (idCarrinho, @estado);
+END $$
 
- 
+DELIMITER $$
 CREATE PROCEDURE filtraProdutosCat(cat VARCHAR(45))
 BEGIN
-   SELECT * FROM produto INNER JOIN categoria ON produto.idCategoria = categoria.idCategoria WHERE nomeCat=cat;
-END;
+   SELECT * FROM produto INNER JOIN categoria ON produto.idCategoria = categoria.idCategoria WHERE categoria.nomeCat=cat;
+END $$
 
+DELIMITER $$
 CREATE PROCEDURE reduzEstoque(baixa INTEGER, id INTEGER) 
 BEGIN
    SET @reducao=baixa;
    SET @idProd=id;
    SET @quantidade=(SELECT quantidade_estoque FROM produto WHERE @idProd=idProduto);
    UPDATE produto SET quantidade_estoque=@quantidade-@reducao WHERE @idProd=idProduto;
-END;
+END $$
 
+DELIMITER $$
 CREATE PROCEDURE aumentaEstoque(acrescimo INTEGER, id INTEGER)
 BEGIN
    SET @aumento=acrescimo;
@@ -96,13 +99,7 @@ BEGIN
    SET @quantidade=0;
    SELECT @quantidade=quantidade_estoque FROM produto WHERE @idProd=idProduto;
    UPDATE produto SET quantidade_estoque=@quantidade-@aumento WHERE @idProd=idProduto;
-END;
+END $$
 
-CREATE TRIGGER operacaoCompra AFTER INSERT ON compras
-FOR EACH ROW
-BEGIN
-   FOR EACH ROW idProduto, quantidade IN carrinho WHERE compras.idCarrinho=idCarrinho
-   BEGIN
-      CALL reduzEstoque(idProduto, quantidade);
-   END;
-END;
+DELIMITER $$
+

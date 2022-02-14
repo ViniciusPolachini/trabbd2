@@ -24,6 +24,8 @@ routes.post('/fornecedor', (req, res) => fornecedor.create(req, res));
 
 //produto
 routes.get('/produto', (req, res) => produto.read(req, res));
+routes.get('/produto/categoria', (req, res) => produto.readCat(req, res));
+routes.get('/produto/nome', (req, res) => produto.readNome(req, res));
 routes.post('/produto', (req, res) => produto.create(req, res));
 
 //usuario

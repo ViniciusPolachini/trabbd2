@@ -7,18 +7,18 @@ module.exports = {
         const {listaProdutos,CPF,statusPagamento} = req.body;
         DB.query(`INSERT INTO carrinho (CPF_cliente) VALUES ("${CPF}")`,(err, data)=>{
             if(err) throw res.status(500).json({msg: err.message});
-            console.log(1);
             listaProdutos.forEach((produto)=>{
                 DB.query(`INSERT INTO item (quantidade, idCarrinho, idProduto) VALUES (${produto.quantidade}, ${data.insertId}, ${produto.idProduto})`,(err, data)=>{
                     if(err) throw res.status(500).json({msg: err.message});
                 });
-            })
-            console.log(2)
-            DB.query(`CALL efetuaCompra("2000-07-10", ${data.insertId}, ${statusPagamento})`,(err, data)=>{
-            if(err) throw res.status(500).json({msg: err.message});
-            return res.status(200).json(data);
+                DB.query(`CALL reduzEstoque(${produto.quantidade},${produto.idProduto})`,(err, data)=>{
+                    if(err) throw res.status(500).json({msg: err.message});
+                });
             });
-            console.log(3)
+            DB.query(`CALL efetuaCompra(${data.insertId}, ${statusPagamento})`,(err, data)=>{
+            if(err) throw res.status(500).json({msg: err.message});
+                return res.status(200).json(data);
+            });
         });
     },
     read(req, res){
