@@ -9,7 +9,7 @@ module.exports = {
         });
     },
     read(req, res){
-        const {email, senha} = req.body
+        const {email, senha} = req.query
         DB.query(`SELECT nome, telefone, email, CPF, nivel FROM usuario WHERE "${email}"=usuario.email AND "${senha}"=usuario.senha`, (err, data) => {
             if(err) throw res.status(500).json({msg: err.message});
             return res.status(200).json(data);

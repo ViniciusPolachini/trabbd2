@@ -20,6 +20,7 @@ routes.post('/compras', (req, res) => compras.create(req, res));
 
 //fornecedor
 routes.get('/fornecedor', (req, res) => fornecedor.read(req, res));
+routes.get('/fornecedor/nome', (req, res) => fornecedor.readNome(req, res));
 routes.post('/fornecedor', (req, res) => fornecedor.create(req, res));
 
 //produto
@@ -27,6 +28,7 @@ routes.get('/produto', (req, res) => produto.read(req, res));
 routes.get('/produto/categoria', (req, res) => produto.readCat(req, res));
 routes.get('/produto/nome', (req, res) => produto.readNome(req, res));
 routes.post('/produto', (req, res) => produto.create(req, res));
+routes.post('/produto/addEstoque', (req, res) => produto.addEstoque(req, res));
 
 //usuario
 routes.get('/usuario', (req, res) => usuario.read(req, res));

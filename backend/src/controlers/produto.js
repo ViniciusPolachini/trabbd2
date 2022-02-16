@@ -8,6 +8,13 @@ module.exports = {
             return res.status(200).json(data);
         });
     },
+    addEstoque(req, res){
+        const {remessa, idProduto} = req.body;
+        DB.query(`UPDATE produto SET quantidade_estoque = (quantidade_estoque + "${remessa}") WHERE produto.idProduto = "${idProduto}"`,(err, data)=>{
+            if(err) throw res.status(500).json({msg: err.message});
+            return res.status(200).json(data);
+        });
+    },
     read(req, res){
         DB.query('SELECT * FROM produto INNER JOIN categoria ON produto.idCategoria = categoria.idCategoria', (err, data) => {
             if(err) throw res.status(500).json({msg: err.message});
@@ -15,16 +22,16 @@ module.exports = {
         });
     },
     readCat(req, res){
-        const {categoria} = req.body;
+        const {categoria} = req.query;
         DB.query(`CALL filtraProdutosCat("${categoria}")`, (err, data) => {
             if(err) throw res.status(500).json({msg: err.message});
             return res.status(200).json(data);
         });
     },
     readNome(req, res){
-        const {nome} = req.body;
+        const {nome} = req.query;
         console.log(nome);
-        DB.query(`SELECT * FROM produto INNER JOIN categoria ON produto.idCategoria = categoria.idCategoria WHERE "${nome}"=produto.nome`, (err, data) => {
+        DB.query(`SELECT * FROM (produto INNER JOIN categoria ON produto.idCategoria = categoria.idCategoria) WHERE produto.nome LIKE "%${nome}%"`, (err, data) => {
             if(err) throw res.status(500).json({msg: err.message});
             return res.status(200).json(data);
         });

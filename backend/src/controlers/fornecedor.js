@@ -13,6 +13,14 @@ module.exports = {
             if(err) throw res.status(500).json({msg: err.message});
             return res.status(200).json(data);
         });
+    },
+
+    readNome(req, res){
+        const {CNPJ} = req.query;
+        DB.query(`SELECT nome FROM fornecedor WHERE fornecedor.CNPJ = "${CNPJ}"`, (err, data) => {
+            if(err) throw res.status(500).json({msg: err.message});
+            return res.status(200).json(data);
+        });
     }
 
 }
